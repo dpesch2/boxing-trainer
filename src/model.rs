@@ -1,11 +1,16 @@
-use std::rc::Rc;
-use rand::prelude::SliceRandom;
-use rand::rngs::StdRng;
-use rand::SeedableRng;
+use std::{
+    rc::Rc, process,
+};
+use rand::{
+    prelude::SliceRandom,
+    rngs::StdRng,
+    SeedableRng,
+};
 use chrono::prelude::*;
-use std::process;
 
-use crate::combination::{self, Combination, Distance, Defense, Faint, Body};
+use crate::combination::{
+    self, Combination, Distance, Defense, Faint, Body
+};
 
 const PATH: &str = "./combinations.txt";
 

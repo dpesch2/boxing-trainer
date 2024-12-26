@@ -1,8 +1,8 @@
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::env;
-use std::rc::Rc;
-use std::fmt;
+use std::{
+    fs::File,
+    io::{self, BufRead},
+    env, rc::Rc, fmt
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Distance {

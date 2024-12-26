@@ -1,12 +1,13 @@
-
 use iced::{
-    Length, Theme, Background, Color,
+    Length, Background, Color,
     widget::{
-        button, button::{Status, Style}, 
+        button, button::Style, 
         column, text, radio, row,
         Column, Button, Scrollable}
 };
-use crate::model::{Model, DistanceSelection, DefenceSelection, FaintSelection, BodySelection};
+use crate::model::{
+    Model, DistanceSelection, DefenceSelection, FaintSelection, BodySelection
+};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Message {
@@ -23,15 +24,19 @@ pub enum Message {
 
 pub fn view(model: &Model) -> Column<Message> {
     let mut column: Column<Message> = Column::new();
-    //let mut scrollable = Scrollable::new(column);
     for (index, item) in model.combinations().iter().enumerate() {
         let mut button: Button<Message> = button(item.description.as_str())
             .on_press(Message::ItemSelected(index))
             .width(Length::Fill);
 
         if index == model.current() {
-            button = button.style(style_selected_button);
-            //scrollable = scrollable.scroll_to(index);
+            button = button.style(|_,_| {
+                Style {
+                    background: Some(Background::Color(Color::from_rgb(0.5, 0.5, 1.0))),
+                    text_color: iced::Color::WHITE,
+                    ..Style::default()
+                }
+            } );
         }
 
         column = column.push(button);
@@ -106,15 +111,6 @@ pub fn view(model: &Model) -> Column<Message> {
     ]
     .into()
 }
-
-
-fn style_selected_button(_: &Theme, _: Status) -> Style {
-    Style {
-        background: Some(Background::Color(Color::from_rgb(0.5, 0.5, 1.0))),
-        text_color: iced::Color::WHITE,
-        ..Style::default()
-    }
-} 
 
 pub fn update(model: &mut Model, message: Message) {
     match message {
