@@ -51,6 +51,10 @@ pub struct Model {
 
 impl Model {
 
+    pub fn current(&self) -> usize {
+        self.current
+    }
+
     pub fn number(&self) -> String {
         format!("{}.", self.number)
     }
