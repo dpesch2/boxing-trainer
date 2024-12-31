@@ -8,6 +8,8 @@ use rand::{
 };
 use chrono::prelude::*;
 
+use iced::widget::scrollable::Id;
+
 use crate::combination::{
     self, Combination, Distance, Defense, Faint, Body
 };
@@ -52,12 +54,17 @@ pub struct Model {
     body_selection: Option<BodySelection>,
     combinations: Vec<Rc<Combination>>,
     data: Vec<Rc<Combination>>,
+    scrollable_id: iced::widget::scrollable::Id,
 }
 
 impl Model {
 
     pub fn current(&self) -> usize {
         self.current
+    }
+
+    pub fn scrollable_id(&self) -> iced::widget::scrollable::Id {
+        self.scrollable_id.clone()
     }
 
     pub fn number(&self) -> String {
@@ -190,6 +197,7 @@ impl Default for Model {
                 BodySelection::All,
             ),
             data: data,
+            scrollable_id: Id::unique()
         };
         s.reset();
         s

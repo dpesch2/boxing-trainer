@@ -1,8 +1,9 @@
 use iced::{
-    Length, Background, Color,
+    Length, Background, Color, Task,
     widget::{
         button, button::Style, 
         column, text, radio, row,
+        scrollable::scroll_to, scrollable::AbsoluteOffset,
         Column, Button, Scrollable}
 };
 use crate::model::{
@@ -22,12 +23,15 @@ pub enum Message {
     ItemSelected(usize),
 }
 
+const BUTTON_HIGHT: f32 = 30.0;
+
 pub fn view(model: &Model) -> Column<Message> {
     let mut column: Column<Message> = Column::new();
     for (index, item) in model.combinations().iter().enumerate() {
         let mut button: Button<Message> = button(item.description.as_str())
             .on_press(Message::ItemSelected(index))
-            .width(Length::Fill);
+            .width(Length::Fill)
+            .height(Length::Fixed(BUTTON_HIGHT));
 
         if index == model.current() {
             button = button.style(|_,_| {
@@ -41,8 +45,7 @@ pub fn view(model: &Model) -> Column<Message> {
 
         column = column.push(button);
     }
-    let scrollable: Scrollable<Message> = Scrollable::new(column);
-
+    let scrollable: Scrollable<Message> = Scrollable::new(column).id(model.scrollable_id().clone());
     let button_row_spacing = 5;
     let row_spacing = 20;
     let radio_label_length = 65;
@@ -112,7 +115,7 @@ pub fn view(model: &Model) -> Column<Message> {
     .into()
 }
 
-pub fn update(model: &mut Model, message: Message) {
+pub fn update(model: &mut Model, message: Message) -> Task<Message> {
     match message {
         Message::Next => {
             model.next();
@@ -142,5 +145,14 @@ pub fn update(model: &mut Model, message: Message) {
             model.set(index);
         }
     }
+    scroll_task(model)  
 }
 
+fn scroll_task(model: &Model) -> Task<Message> {
+    let scroll_to_position =  BUTTON_HIGHT * model.current() as f32;
+    let task = scroll_to(model.scrollable_id().clone(), AbsoluteOffset {
+        x: 0.0,
+        y: scroll_to_position,
+    });
+    task
+}

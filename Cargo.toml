@@ -1,9 +1,9 @@
 [package]
-name = "boxing-trainer-iced"
+name = "boxing-trainer"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-iced = { version = "0.13", features = ["tokio"] }
+iced = { version = "0.13", features = ["tokio", "default", "advanced"] }
 rand = "0.8.5"
 chrono = "0.4"
