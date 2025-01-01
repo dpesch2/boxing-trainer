@@ -12,9 +12,10 @@ use crate::model::{
 
 #[derive(Debug, Clone, Copy)]
 pub enum Message {
-    Reset,
     Next,
     Previous,
+    Reset,
+    InOrder,
     Reload,
     DistanceSelected(DistanceSelection),
     DefenceSelected(DefenceSelection),
@@ -70,6 +71,9 @@ pub fn view(model: &Model) -> Column<Message> {
             button("Reset")
                 .on_press(Message::Reset)
                 .width(Length::Fill),
+            button("In Order")
+                .on_press(Message::InOrder)
+                .width(Length::Fill),    
             button("Reload")
                 .on_press(Message::Reload)
                 .width(Length::Fill),  
@@ -124,7 +128,10 @@ pub fn update(model: &mut Model, message: Message) -> Task<Message> {
             model.previous();
         }
         Message::Reset => {
-            model.reset();
+            model.reset_in_random_order();
+        }
+        Message::InOrder => {
+            model.reset_in_order();
         }
         Message::Reload => {
             model.reload();

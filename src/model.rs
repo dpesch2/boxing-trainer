@@ -120,10 +120,20 @@ impl Model {
 
     pub fn reset(&mut self) {
         self.number = 1;
+        self.current = 0;
+    }
+
+    pub fn reset_in_random_order(&mut self) {
+        self.reset();
+     
         let seed = Utc::now().timestamp_millis() as u64;
         let mut rng = StdRng::seed_from_u64(seed);
         self.combinations.shuffle(&mut rng);
-        self.current = 0;
+    }
+
+    pub fn reset_in_order(&mut self) {
+        self.reset();
+        self.update_filter();
     }
 
     pub fn next(&mut self) {
@@ -169,7 +179,7 @@ impl Model {
             process::exit(1);
         }
         self.data = data.unwrap();
-        self.update_filter();
+        self.reset_in_random_order();
     }
    
 }
@@ -199,7 +209,7 @@ impl Default for Model {
             data: data,
             scrollable_id: Id::unique()
         };
-        s.reset();
+        s.reset_in_random_order();
         s
     }
 }
