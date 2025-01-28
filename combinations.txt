@@ -133,8 +133,8 @@ overhand_2 counter with step left; Long;  Yes;  No;  No
 overhand_2 counter with slip left; Long;  Yes;  No;  No
 1_with_slip entry with step; Long;  Yes;  No;  No
 2_with_slip entry with step; Long;  Yes;  No;  No
-1_with_slip defense with counter; Long;  Yes;  No;  No
-2_with_slip defense with counter; Long;  Yes;  No;  No
+1_with_slip defense counter; Long;  Yes;  No;  No
+2_with_slip defense counter; Long;  Yes;  No;  No
 1-2-roll-2-3-2; Long;  Yes;  No;  No
 1-2-3-2-3-2; Long;  No;  No;  No
 1-2-slip-slip-3-2; Long;  Yes;  No;  No
