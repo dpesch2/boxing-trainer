@@ -72,7 +72,7 @@ impl Model {
     }
    
     pub fn combination(&self) -> String {
-        if self.combinations.len() == 0 {
+        if self.combinations.is_empty() {
             return "None".to_owned();
         }
         self.combinations[self.current].description.clone()
@@ -137,7 +137,7 @@ impl Model {
     }
 
     pub fn next(&mut self) {
-        if self.combinations.len() == 0 {
+        if self.combinations.is_empty() {
             return;
         }
         self.number += 1;
@@ -145,7 +145,7 @@ impl Model {
     }
 
     pub fn previous(&mut self) {
-        if self.combinations.len() == 0 {
+        if self.combinations.is_empty() {
             return;
         }
         self.number += 1;
@@ -206,7 +206,7 @@ impl Default for Model {
                 FaintSelection::All,
                 BodySelection::All,
             ),
-            data: data,
+            data,
             scrollable_id: Id::unique()
         };
         s.reset_in_random_order();
@@ -222,7 +222,7 @@ fn filter(
     body: BodySelection) -> Vec<Rc<Combination>> {
         let mut result: Vec<Rc<Combination>> =  vec![];   
         for c in data {
-            if filter_combination(&c, distance, defence, faint, body) {
+            if filter_combination(c, distance, defence, faint, body) {
                 result.push(c.clone());
             }
         };
@@ -236,63 +236,39 @@ fn filter_combination(
     faint: FaintSelection,
     body: BodySelection) -> bool {
         let distance_result = match com.distance {
-            Distance::Long => {
-                match distance {
-                    DistanceSelection::Short => false,
-                    _ => true
-                }
+            Distance::Long => { 
+                !matches!(distance, DistanceSelection::Short) 
             },
             Distance::Short => {
-                match distance {
-                DistanceSelection::Long => false,
-                _ => true
-                }
+                !matches!(distance, DistanceSelection::Long)
             }
         };
 
         let defense_result = match com.defense {
             Defense::Yes => {
-                match defence {
-                    DefenceSelection::No => false,
-                    _ => true
-                }
+                !matches!(defence, DefenceSelection::No)
             },
             Defense::No => {
-                match defence {
-                    DefenceSelection::Yes => false,
-                    _ => true
-                }
+                !matches!(defence, DefenceSelection::Yes)
             }
         };
 
         let faint_result = match com.faint {
             Faint::Yes => {
-                match faint {
-                    FaintSelection::No => false,
-                    _ => true
-                }
+                !matches!(faint, FaintSelection::No)
             },
             Faint::No => {
-                match faint {
-                    FaintSelection::Yes => false,
-                    _ => true
-                }
+                !matches!(faint, FaintSelection::Yes)
             }
 
         };
 
         let body_result = match com.body {
             Body::Yes => {
-                match body {
-                    BodySelection::No => false,
-                    _ => true
-                }
+                !matches!(body, BodySelection::No)
             },
             Body::No => {
-                match body {
-                    BodySelection::Yes => false,
-                    _ => true
-                }
+                !matches!(body, BodySelection::Yes)
             }
 
         };

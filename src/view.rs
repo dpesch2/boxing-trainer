@@ -116,7 +116,6 @@ pub fn view(model: &Model) -> Column<Message> {
         ].spacing(row_spacing), 
          scrollable,
     ]
-    .into()
 }
 
 pub fn update(model: &mut Model, message: Message) -> Task<Message> {
@@ -157,9 +156,8 @@ pub fn update(model: &mut Model, message: Message) -> Task<Message> {
 
 fn scroll_task(model: &Model) -> Task<Message> {
     let scroll_to_position =  BUTTON_HIGHT * model.current() as f32;
-    let task = scroll_to(model.scrollable_id().clone(), AbsoluteOffset {
+    scroll_to(model.scrollable_id().clone(), AbsoluteOffset {
         x: 0.0,
         y: scroll_to_position,
-    });
-    task
+    })
 }
