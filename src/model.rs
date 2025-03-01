@@ -1,18 +1,10 @@
-use std::{
-    rc::Rc, process,
-};
-use rand::{
-    prelude::SliceRandom,
-    rngs::StdRng,
-    SeedableRng,
-};
 use chrono::prelude::*;
+use rand::{SeedableRng, prelude::SliceRandom, rngs::StdRng};
+use std::{process, rc::Rc};
 
 use iced::widget::scrollable::Id;
 
-use crate::combination::{
-    self, Combination, Distance, Defense, Faint, Body
-};
+use crate::combination::{self, Body, Combination, Defense, Distance, Faint};
 
 const PATH: &str = "./combinations.txt";
 
@@ -58,7 +50,6 @@ pub struct Model {
 }
 
 impl Model {
-
     pub fn current(&self) -> usize {
         self.current
     }
@@ -70,7 +61,7 @@ impl Model {
     pub fn number(&self) -> String {
         format!("{}.", self.number)
     }
-   
+
     pub fn combination(&self) -> String {
         if self.combinations.is_empty() {
             return "None".to_owned();
@@ -86,13 +77,13 @@ impl Model {
         self.distance_selection
     }
 
-    pub fn set_distance_selection(&mut self, option:  DistanceSelection ) {
+    pub fn set_distance_selection(&mut self, option: DistanceSelection) {
         self.distance_selection = Some(option);
         self.update_filter();
     }
 
     pub fn defence_selection(&self) -> Option<DefenceSelection> {
-       self.defence_selection 
+        self.defence_selection
     }
 
     pub fn set_defence_selection(&mut self, option: DefenceSelection) {
@@ -125,7 +116,7 @@ impl Model {
 
     pub fn reset_in_random_order(&mut self) {
         self.reset();
-     
+
         let seed = Utc::now().timestamp_millis() as u64;
         let mut rng = StdRng::seed_from_u64(seed);
         self.combinations.shuffle(&mut rng);
@@ -141,7 +132,7 @@ impl Model {
             return;
         }
         self.number += 1;
-        self.current = (self.current+1) % self.combinations.len();
+        self.current = (self.current + 1) % self.combinations.len();
     }
 
     pub fn previous(&mut self) {
@@ -151,10 +142,10 @@ impl Model {
         self.number += 1;
 
         self.current = if self.current == 0 {
-                            self.combinations.len()-1
-                        } else {
-                            self.current-1
-                        }
+            self.combinations.len() - 1
+        } else {
+            self.current - 1
+        }
     }
 
     pub fn set(&mut self, index: usize) {
@@ -164,11 +155,12 @@ impl Model {
 
     fn update_filter(&mut self) {
         self.combinations = filter(
-            &self.data, 
+            &self.data,
             self.distance_selection.unwrap(),
             self.defence_selection.unwrap(),
             self.faint_selection.unwrap(),
-            self.body_selection.unwrap());
+            self.body_selection.unwrap(),
+        );
         self.reset()
     }
 
@@ -181,11 +173,10 @@ impl Model {
         self.data = data.unwrap();
         self.reset_in_random_order();
     }
-   
 }
 
 impl Default for Model {
-    fn default() -> Self { 
+    fn default() -> Self {
         let data = combination::load_data(PATH);
         if data.is_err() {
             eprintln!("ERROR {}", data.unwrap_err());
@@ -200,14 +191,14 @@ impl Default for Model {
             faint_selection: Some(FaintSelection::All),
             body_selection: Some(BodySelection::All),
             combinations: filter(
-                &data, 
+                &data,
                 DistanceSelection::All,
                 DefenceSelection::All,
                 FaintSelection::All,
                 BodySelection::All,
             ),
             data,
-            scrollable_id: Id::unique()
+            scrollable_id: Id::unique(),
         };
         s.reset_in_random_order();
         s
@@ -215,64 +206,47 @@ impl Default for Model {
 }
 
 fn filter(
-    data: &Vec<Rc<Combination>>, 
+    data: &Vec<Rc<Combination>>,
     distance: DistanceSelection,
     defence: DefenceSelection,
     faint: FaintSelection,
-    body: BodySelection) -> Vec<Rc<Combination>> {
-        let mut result: Vec<Rc<Combination>> =  vec![];   
-        for c in data {
-            if filter_combination(c, distance, defence, faint, body) {
-                result.push(c.clone());
-            }
-        };
-        result
+    body: BodySelection,
+) -> Vec<Rc<Combination>> {
+    let mut result: Vec<Rc<Combination>> = vec![];
+    for c in data {
+        if filter_combination(c, distance, defence, faint, body) {
+            result.push(c.clone());
+        }
+    }
+    result
 }
 
 fn filter_combination(
-    com: &Combination, 
+    com: &Combination,
     distance: DistanceSelection,
     defence: DefenceSelection,
     faint: FaintSelection,
-    body: BodySelection) -> bool {
-        let distance_result = match com.distance {
-            Distance::Long => { 
-                !matches!(distance, DistanceSelection::Short) 
-            },
-            Distance::Short => {
-                !matches!(distance, DistanceSelection::Long)
-            }
-        };
+    body: BodySelection,
+) -> bool {
+    let distance_result = match com.distance {
+        Distance::Long => !matches!(distance, DistanceSelection::Short),
+        Distance::Short => !matches!(distance, DistanceSelection::Long),
+    };
 
-        let defense_result = match com.defense {
-            Defense::Yes => {
-                !matches!(defence, DefenceSelection::No)
-            },
-            Defense::No => {
-                !matches!(defence, DefenceSelection::Yes)
-            }
-        };
+    let defense_result = match com.defense {
+        Defense::Yes => !matches!(defence, DefenceSelection::No),
+        Defense::No => !matches!(defence, DefenceSelection::Yes),
+    };
 
-        let faint_result = match com.faint {
-            Faint::Yes => {
-                !matches!(faint, FaintSelection::No)
-            },
-            Faint::No => {
-                !matches!(faint, FaintSelection::Yes)
-            }
+    let faint_result = match com.faint {
+        Faint::Yes => !matches!(faint, FaintSelection::No),
+        Faint::No => !matches!(faint, FaintSelection::Yes),
+    };
 
-        };
+    let body_result = match com.body {
+        Body::Yes => !matches!(body, BodySelection::No),
+        Body::No => !matches!(body, BodySelection::Yes),
+    };
 
-        let body_result = match com.body {
-            Body::Yes => {
-                !matches!(body, BodySelection::No)
-            },
-            Body::No => {
-                !matches!(body, BodySelection::Yes)
-            }
-
-        };
-
-        distance_result && defense_result && faint_result && body_result
+    distance_result && defense_result && faint_result && body_result
 }
-
