@@ -1,5 +1,5 @@
 use std::{
-    env, fmt,
+    env, fmt, error,
     fs::File,
     io::{self, BufRead},
     rc::Rc,
@@ -71,13 +71,20 @@ impl fmt::Display for CombinationError {
     }
 }
 
-impl From<std::io::Error> for CombinationError {
-    fn from(error: std::io::Error) -> Self {
+impl From<io::Error> for CombinationError {
+    fn from(error: io::Error) -> Self {
         CombinationError::IoError(error)
     }
 }
 
-impl std::error::Error for CombinationError {}
+impl error::Error for CombinationError {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        match self {
+            CombinationError::IoError(e) => Some(e),
+            CombinationError::ParseError(_) => None,
+        }
+    }
+}
 
 pub fn load_data(path: &str) -> Result<Vec<Rc<Combination>>, CombinationError> {
     println!("CWD is {:?}, path is {:?}", env::current_dir()?, path);
