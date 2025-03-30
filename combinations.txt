@@ -162,4 +162,7 @@ with step 2 left+shift-4b-4; Long;  Yes;  No;  No
 close step_left_6-pivot_3; Short;  Yes;  No;  No
 close 3b-side_step_right-3b; Short;  Yes;  No;  Yes
 1-2-slip-slip-roll 2-3-2 stepback 6-3-2  1-1-2; Long;  Yes;  No;  No
+close setup 1 side_step_right-3b_between_guard; Short;  No;  No;  Yes
+close setup 1-2-1 6; Short;  No;  No;  No
+stepping 1-2-gazelle-3; Long;  No;  No;  No
 
