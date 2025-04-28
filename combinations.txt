@@ -158,7 +158,7 @@ with steps 2-3 step_left+shift-4; Long;  Yes;  No;  No
 with steps 1-pivot_right; Long;  Yes;  No;  No
 with step 1 right+shift-3b-3; Long;  Yes;  No;  No
 with step 2 left+shift-4b-4; Long;  Yes;  No;  No
-1-2-right_side_steo+2-3b-3b; Long;  Yes;  No;  No
+1-2-right_side_step+2-3b-3b; Long;  Yes;  No;  No
 close step_left_6-pivot_3; Short;  Yes;  No;  No
 close 3b-side_step_right-3b; Short;  Yes;  No;  Yes
 1-2-slip-slip-roll 2-3-2 stepback 6-3-2  1-1-2; Long;  Yes;  No;  No
