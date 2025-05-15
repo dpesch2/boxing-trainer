@@ -165,4 +165,5 @@ close 3b-side_step_right-3b; Short;  Yes;  No;  Yes
 close setup 1 side_step_right-3b_between_guard; Short;  No;  No;  Yes
 close setup 1-2-1 6; Short;  No;  No;  No
 stepping 1-2-gazelle-3; Long;  No;  No;  No
+close setup short 1 4-3b; Short;  No;  No;  No
 
