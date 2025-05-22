@@ -1,6 +1,6 @@
 use chrono::prelude::*;
 use rand::{SeedableRng, prelude::SliceRandom, rngs::StdRng};
-use std::{process, rc::Rc};
+use std::{process, rc::Rc, env, process::Command};
 
 use iced::widget::scrollable::Id;
 
@@ -172,6 +172,26 @@ impl Model {
         }
         self.data = data.unwrap();
         self.reset_in_random_order();
+    }
+
+    pub fn show(&self) {
+        let url_op = self.combinations[self.current].url.clone();
+        println!("Show combination {} url {}", self.current, url_op.clone().unwrap_or("None".to_owned()));
+        if let Some(url) = url_op {
+            let key = "BROWSER";
+            match env::var(key) {
+                Ok(val) => {
+                    Command::new(val)
+                        .arg("--new-tab")
+                        .arg(url)
+                        .spawn()
+                        .expect("Failed to start process")
+                        .wait()
+                        .expect("Failed to wait on child");
+                }
+                Err(e) => eprintln!("Couldn't find env variable {key}: {e}"),
+            }
+        }
     }
 }
 

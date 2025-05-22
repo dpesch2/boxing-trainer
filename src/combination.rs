@@ -36,6 +36,7 @@ pub struct Combination {
     pub defense: Defense,
     pub faint: Faint,
     pub body: Body,
+    pub url: Option<String>,
 }
 
 #[derive(Debug)]
@@ -44,6 +45,14 @@ pub enum CombinationError {
     ParseError(String),
 }
 
+const FIELD_COUNT : usize = 6;
+const DELIMITER : &str = ";";
+const COMMENT : &str = "#";
+const SHORT : &str = "short";
+const LONG : &str = "long";
+const YES : &str = "yes";
+const NO : &str = "no";
+
 impl Combination {
     fn new(
         description: String,
@@ -51,6 +60,7 @@ impl Combination {
         defense: Defense,
         faint: Faint,
         body: Body,
+        url: Option<String>
     ) -> Combination {
         Combination {
             description,
@@ -58,6 +68,7 @@ impl Combination {
             defense,
             faint,
             body,
+            url,
         }
     }
 }
@@ -93,7 +104,7 @@ pub fn load_data(path: &str) -> Result<Vec<Rc<Combination>>, CombinationError> {
     let reader = io::BufReader::new(file);
     for line in reader.lines() {
         let line = line?.trim().to_owned();
-        if line.starts_with("#") || line.is_empty() {
+        if line.starts_with(COMMENT) || line.is_empty() {
             continue;
         }
         let combination = parse_combination(&line)?;
@@ -103,18 +114,18 @@ pub fn load_data(path: &str) -> Result<Vec<Rc<Combination>>, CombinationError> {
 }
 
 fn parse_combination(line: &str) -> Result<Rc<Combination>, CombinationError> {
-    let el: Vec<&str> = line.split(";").collect();
-    if el.len() != 5 {
+    let el: Vec<&str> = line.split(DELIMITER).collect();
+    if el.len() != FIELD_COUNT {
         return Err(CombinationError::ParseError(format!(
-            "Expect five elements delimited by ; in {:?}",
-            line
+            "Expect {} elements delimited by {} in {:?}",
+            FIELD_COUNT, DELIMITER, line
         )));
     }
     let description = el[0].trim().to_owned();
     let distance = el[1].trim();
-    let distance = if distance.eq_ignore_ascii_case("long") {
+    let distance = if distance.eq_ignore_ascii_case(LONG) {
         Distance::Long
-    } else if distance.eq_ignore_ascii_case("short") {
+    } else if distance.eq_ignore_ascii_case(SHORT) {
         Distance::Short
     } else {
         return Err(CombinationError::ParseError(format!(
@@ -152,20 +163,27 @@ fn parse_combination(line: &str) -> Result<Rc<Combination>, CombinationError> {
             )));
         }
     };
+    let url = el[5];
+    let url = if url.is_empty() {
+        None
+    } else {
+        Some(url.trim().to_owned())
+    };
     Ok(Rc::new(Combination::new(
         description,
         distance,
         defense,
         faint,
         body,
+        url,
     )))
 }
 
 fn parse_yes_no<T>(field: &str, yes: T, no: T) -> Option<T> {
     let field = field.trim();
-    if field.eq_ignore_ascii_case("yes") {
+    if field.eq_ignore_ascii_case(YES) {
         Some(yes)
-    } else if field.eq_ignore_ascii_case("no") {
+    } else if field.eq_ignore_ascii_case(NO) {
         Some(no)
     } else {
         None
@@ -179,7 +197,7 @@ mod tests {
     #[test]
     fn test_parse_combination() {
         assert_eq!(
-            parse_combination("1-1-2-step_back-2; Long;  Yes;  No;  No")
+            parse_combination("1-1-2-step_back-2; Long;  Yes;  No;  No; https://example.com")
                 .unwrap()
                 .as_ref(),
             &Combination {
@@ -187,7 +205,8 @@ mod tests {
                 distance: Distance::Long,
                 defense: Defense::Yes,
                 faint: Faint::No,
-                body: Body::No
+                body: Body::No,
+                url: Some("https://example.com".to_owned()),
             }
         );
     }
@@ -206,10 +225,10 @@ mod tests {
     #[test]
     fn test_parse_error_distance() {
         assert_eq!(
-            parse_combination("1-1-2-step_back-2; XXX;  Yes;  No;  No")
+            parse_combination("1-1-2-step_back-2; XXX;  Yes;  No;  No;")
                 .unwrap_err()
                 .to_string(),
-            "Parse error: Unknown distance \"XXX\" in \"1-1-2-step_back-2; XXX;  Yes;  No;  No\""
+            "Parse error: Unknown distance \"XXX\" in \"1-1-2-step_back-2; XXX;  Yes;  No;  No;\""
                 .to_owned()
         );
     }
@@ -217,10 +236,10 @@ mod tests {
     #[test]
     fn test_parse_error_defence() {
         assert_eq!(
-            parse_combination("1-1-2-step_back-2; Long;  XXX;  No;  No")
+            parse_combination("1-1-2-step_back-2; Long;  XXX;  No;  No;")
                 .unwrap_err()
                 .to_string(),
-            "Parse error: Unknown defense \"  XXX\" in \"1-1-2-step_back-2; Long;  XXX;  No;  No\""
+            "Parse error: Unknown defense \"  XXX\" in \"1-1-2-step_back-2; Long;  XXX;  No;  No;\""
                 .to_owned()
         );
     }
@@ -228,10 +247,10 @@ mod tests {
     #[test]
     fn test_parse_error_faint() {
         assert_eq!(
-            parse_combination("1-1-2-step_back-2; Long;  Yes;  XXX;  No")
+            parse_combination("1-1-2-step_back-2; Long;  Yes;  XXX;  No;")
                 .unwrap_err()
                 .to_string(),
-            "Parse error: Unknown faint \"  XXX\" in \"1-1-2-step_back-2; Long;  Yes;  XXX;  No\""
+            "Parse error: Unknown faint \"  XXX\" in \"1-1-2-step_back-2; Long;  Yes;  XXX;  No;\""
                 .to_owned()
         );
     }
@@ -239,10 +258,10 @@ mod tests {
     #[test]
     fn test_parse_error_body() {
         assert_eq!(
-            parse_combination("1-1-2-step_back-2; Long;  Yes;  No;  XXX")
+            parse_combination("1-1-2-step_back-2; Long;  Yes;  No;  XXX;")
                 .unwrap_err()
                 .to_string(),
-            "Parse error: Unknown body \"  XXX\" in \"1-1-2-step_back-2; Long;  Yes;  No;  XXX\""
+            "Parse error: Unknown body \"  XXX\" in \"1-1-2-step_back-2; Long;  Yes;  No;  XXX;\""
                 .to_owned()
         );
     }

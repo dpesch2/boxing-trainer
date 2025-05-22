@@ -19,6 +19,7 @@ pub enum Message {
     FaintSelected(FaintSelection),
     BodySelected(BodySelection),
     ItemSelected(usize),
+    Show,
 }
 
 const BUTTON_HIGHT: f32 = 30.0;
@@ -62,6 +63,9 @@ pub fn view(model: &Model) -> Column<Message> {
             button("Reload")
                 .on_press(Message::Reload)
                 .width(Length::Fill),
+            button("Show")
+                .on_press(Message::Show)
+                .width(Length::Fill),    
         ]
         .spacing(button_row_spacing),
         row![
@@ -199,6 +203,9 @@ pub fn update(model: &mut Model, message: Message) -> Task<Message> {
         }
         Message::ItemSelected(index) => {
             model.set(index);
+        }
+        Message::Show => {
+            model.show();
         }
     }
     scroll_task(model)
